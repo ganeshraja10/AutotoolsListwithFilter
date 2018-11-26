@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height,initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <meta name="autotoolswebscreen" type="variablejs" id="pageTitle" label="Page Title" description="Title to display on the page" />
+    <meta name="autotoolswebscreen" type="variablejs" id="labelValue" label="Label Values" description="Label values to display on the list" />
+    <meta name="autotoolswebscreen" type="variablejs" id="commands" label="Commands" description="List of autocommands separted with comma" />
+    <meta name="autotoolswebscreen" type="variablejs" id="autocommandname" label="AutoTools Command Name" description="AutoTools Command used in filter" />
+    <style>
+        a.list-group-item
+      {
+       font-size: large;   
+       margin-bottom:2px;
+
+      }
+  </style>
+</head>
+
+<body>
+    <div class="container">
+        <h3 id="title"></h3>
+        <br>
+        <div class="form-label-group">
+            <input type="text" class="form-control" placeholder="Filter" id="search-filter" />
+        </div>
+        <br>
+        <div class="list-group" id="list">
+        </div>
+    </div>
+
+</body>
+<script type="text/javascript">
+    function sendCommand(e) {
+        e = e || window.event;
+        AutoTools.sendCommand(autocommandname+'=:='+$(e).attr('command').trim());
+    }
+    $(document).ready(function () {
+        AutoTools.setDefaultValues({
+            "labelValue": "Title 1,Title 2,Title 3",
+            "commands": "text 1,text 2,text 3",
+            "autocommandname":"task"
+                });
+        var titleElement = $("#title");
+        if (AutoTools.isSet("pageTitle")) {
+            titleElement.innerText = pageTitle;
+        } else {
+            titleElement.hide();;
+        }
+        if (AutoTools.isSet("labelValue")) {
+            var label_list = labelValue.split(",");
+            var command_list = commands.split(",");
+            itemUI = "";
+            $.each(label_list, function (key, val) {
+                var command;
+                if (key < command_list.length)
+                    command = command_list[key]
+                itemUI = itemUI + '<a href="#" class="list-group-item list-group-item-action" onclick="return sendCommand(this)" command="' + command + '" >' + val + '</a>'
+                    ;
+            });
+            $('#list').html(itemUI);
+        } else {
+        }
+        var input = $('#search-filter');
+        console.log(input.attr('placeholder'));
+        input.change(function () {
+            var filter = input.val();
+            console.log(filter)
+            filter = filter.toLowerCase();
+            if (filter.length == 0) { // show all if filter is empty
+                $('.list-group-item-action').each(function () {
+                    $(this).show();
+                    console.log($(this));
+                });
+                return;
+            }
+            $('.list-group-item-action').each(function () {
+                if (!($(this).text().toLowerCase().startsWith(filter))) {
+                    $(this).hide();
+                }
+                else {
+                    $(this).show();
+                }
+            });
+
+        }).keyup(function () {
+            $(this).change();
+        });
+    });
+</script>
+</html>
